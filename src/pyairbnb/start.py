@@ -216,11 +216,14 @@ def search_experience_by_taking_the_first_inputs_i_dont_care(user_input_text: st
         result = result + result_tmp
     return result
 
-def search_all_from_url(url: str, currency: str = "USD", language: str = "en", proxy_url: str = "", hash: str = "", timeout: Timeout = DEFAULT_TIMEOUT):
+def search_all_from_url(url: str, currency: str = "USD", language: str = "en", proxy_url: str = "", hash: str = "", timeout: Timeout = DEFAULT_TIMEOUT, first_page_only: bool = False):
     """
     Parses an Airbnb search URL and forwards all recognizable filters to
     Airbnb's StaysSearch API. The URL is the source of truth: any URL
     parameter (known or unknown) is passed through.
+
+    Set first_page_only=True to return the first page without following the
+    next page cursor.
     """
     raw_params = search.url_to_raw_params(url)
     api_key = api.get(proxy_url)
@@ -248,6 +251,8 @@ def search_all_from_url(url: str, currency: str = "USD", language: str = "en", p
         )
         results = standardize.from_search(results_raw)
         all_results.extend(results)
+        if first_page_only:
+            break
         if not results or not paginationInfo.get("nextPageCursor"):
             break
         cursor = paginationInfo["nextPageCursor"]

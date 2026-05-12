@@ -96,6 +96,9 @@ results = pyairbnb.search_all_from_url(
     hash=dynamic_hash, # optional, fallbacks to predefined hash
 )
 
+# By default, search_all_from_url follows pagination and returns all pages.
+# Pass first_page_only=True to return only the first page.
+
 # Save results and print count
 with open('search_from_url.json', 'w', encoding='utf-8') as f:
     json.dump(results, f, ensure_ascii=False, indent=2)
