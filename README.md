@@ -18,6 +18,7 @@ to match the name with pip name
 - With the new airbnb changes, if you want to get the price from a room url you need to specify the date range
 the date range should be on the format year-month-day, if you leave the date range empty, you will get the details but not the price
 - All HTTP-facing functions accept a `timeout` argument. It defaults to 60 seconds, accepts the same values as `curl_cffi` (`int`, `float`, `(connect_timeout, read_timeout)` tuple), and can be set to `None` to disable timeouts.
+- `search_all`, `search_first_page`, and `search_all_from_url` accept an optional `api_key` argument. For bulk search jobs, fetch it once with `get_api_key` and pass it to each call to avoid an extra API-key request per search.
 
 
 ### Install
@@ -49,6 +50,7 @@ amenities = [4, 7]  # Example: Filter for listings with WiFi and Pool or leave e
 free_cancellation = False  # Filter for listings with free/flexible cancellation
 language = "th"
 proxy_url = ""
+api_key = pyairbnb.get_api_key(proxy_url)
 
 # Search listings within specified coordinates and date range using keyword arguments
 search_results = pyairbnb.search_all(
@@ -68,6 +70,7 @@ search_results = pyairbnb.search_all(
     language=language,
     proxy_url=proxy_url,
     timeout=30,
+    api_key=api_key,
 )
 
 # Save the search results as a JSON file
@@ -87,6 +90,7 @@ url = "https://www.airbnb.com/s/Luxembourg--Luxembourg/homes?checkin=2026-02-09&
 # Fetches the live StaysSearch hash first so
 # the persisted query id matches airbnb website.
 dynamic_hash = pyairbnb.fetch_stays_search_hash()
+api_key = pyairbnb.get_api_key("")
 # Use the URL wrapper
 results = pyairbnb.search_all_from_url(
     url,
@@ -94,6 +98,7 @@ results = pyairbnb.search_all_from_url(
     language="es",
     proxy_url="",
     hash=dynamic_hash, # optional, fallbacks to predefined hash
+    api_key=api_key,
 )
 
 # Save results and print count

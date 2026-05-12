@@ -111,7 +111,7 @@ def get_details(room_url: str = None, room_id: int = None, domain: str = "www.ai
     return data
 
 def search_all(check_in: str, check_out: str, ne_lat: float, ne_long: float, sw_lat: float, sw_long: float,
-               zoom_value: int, price_min: int, price_max: int, place_type: str = "", amenities: list = [], free_cancellation: bool = False, adults: int = 0, children: int = 0, infants: int = 0, min_bedrooms: int = 0, min_beds: int = 0, min_bathrooms: int = 0, currency: str = "USD", language: str = "en", proxy_url: str = "", hash: str = "", timeout: Timeout = DEFAULT_TIMEOUT):
+               zoom_value: int, price_min: int, price_max: int, place_type: str = "", amenities: list = [], free_cancellation: bool = False, adults: int = 0, children: int = 0, infants: int = 0, min_bedrooms: int = 0, min_beds: int = 0, min_bathrooms: int = 0, currency: str = "USD", language: str = "en", proxy_url: str = "", hash: str = "", timeout: Timeout = DEFAULT_TIMEOUT, api_key: str = ""):
     """
     Performs a paginated search for all rooms within specified geographic bounds.
 
@@ -134,11 +134,12 @@ def search_all(check_in: str, check_out: str, ne_lat: float, ne_long: float, sw_
         min_bathrooms (int): Minimum number of bathrooms
         language (str): language to use for example en,es,tr ..etc
         proxy_url (str): Proxy URL.
+        api_key (str): Optional Airbnb API key. When provided, skips the API key fetch.
 
     Returns:
         list: A list of all search results.
     """
-    api_key = api.get(proxy_url, timeout=timeout)
+    api_key = api_key or api.get(proxy_url, timeout=timeout)
     all_results = []
     cursor = ""
     while True:
@@ -155,7 +156,7 @@ def search_all(check_in: str, check_out: str, ne_lat: float, ne_long: float, sw_
     return all_results
 
 def search_first_page(check_in: str, check_out: str, ne_lat: float, ne_long: float, sw_lat: float, sw_long: float,
-               zoom_value: int, price_min: int, price_max: int, place_type: str = "", amenities: list = [], free_cancellation: bool = False, adults: int = 0, children: int = 0, infants: int = 0, min_bedrooms: int = 0, min_beds: int = 0, min_bathrooms: int = 0, currency: str = "USD", language: str = "en", proxy_url: str = "", hash: str = "", timeout: Timeout = DEFAULT_TIMEOUT):
+               zoom_value: int, price_min: int, price_max: int, place_type: str = "", amenities: list = [], free_cancellation: bool = False, adults: int = 0, children: int = 0, infants: int = 0, min_bedrooms: int = 0, min_beds: int = 0, min_bathrooms: int = 0, currency: str = "USD", language: str = "en", proxy_url: str = "", hash: str = "", timeout: Timeout = DEFAULT_TIMEOUT, api_key: str = ""):
     """
     Searches the first page of results within specified geographic bounds.
 
@@ -178,11 +179,12 @@ def search_first_page(check_in: str, check_out: str, ne_lat: float, ne_long: flo
         min_bathrooms (int): Minimum number of bathrooms
         language (str): language to use for example en,es,tr ..etc
         proxy_url (str): Proxy URL.
+        api_key (str): Optional Airbnb API key. When provided, skips the API key fetch.
 
     Returns:
         list: A list of search results from the first page.
     """
-    api_key = api.get(proxy_url, timeout=timeout)
+    api_key = api_key or api.get(proxy_url, timeout=timeout)
     results_raw = search.get(
         api_key, "", check_in, check_out, ne_lat, ne_long, sw_lat, sw_long, zoom_value,
         currency, place_type, price_min, price_max, amenities, free_cancellation, adults, children, infants, min_bedrooms, min_beds, min_bathrooms, language, proxy_url, hash=hash, timeout=timeout
@@ -216,14 +218,16 @@ def search_experience_by_taking_the_first_inputs_i_dont_care(user_input_text: st
         result = result + result_tmp
     return result
 
-def search_all_from_url(url: str, currency: str = "USD", language: str = "en", proxy_url: str = "", hash: str = "", timeout: Timeout = DEFAULT_TIMEOUT):
+def search_all_from_url(url: str, currency: str = "USD", language: str = "en", proxy_url: str = "", hash: str = "", timeout: Timeout = DEFAULT_TIMEOUT, api_key: str = ""):
     """
     Parses an Airbnb search URL and forwards all recognizable filters to
     Airbnb's StaysSearch API. The URL is the source of truth: any URL
     parameter (known or unknown) is passed through.
+
+    Set api_key to reuse a previously fetched Airbnb API key.
     """
     raw_params = search.url_to_raw_params(url)
-    api_key = api.get(proxy_url)
+    api_key = api_key or api.get(proxy_url, timeout=timeout)
     all_results = []
     cursor = ""
     # search.get's structured-args are ignored when raw_params is supplied,
